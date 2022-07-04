@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nowcoder.community.dao.DiscussPostMapper">
+    <!--  声明一个sql语句，并且指定id，将经常复用的东西写在里面，之后便可以通过<include refid="selectFields"></include>语句来调用了。   -->
+    <sql id="selectFields">
+        id, user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <select id="selectDiscussPosts" resultType="DiscussPost">
+        <!--  里面写SQL语句 -->
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where status != 2
+        <!--  使用if标签写动态的SQL语句 -->
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
+        order by type desc, create_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectDiscussPostRows" resultType="int">
+        <!--  里面写SQL语句 -->
+        select count(id)
+        from discuss_post
+        where status != 2
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
+    </select>
+
+
+</mapper>

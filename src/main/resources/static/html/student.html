@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>增加学生</title>
+</head>
+<body>
+    <!-- 创建一个表单,并且规定这个表单用post的方式提交，且给出提交路径(action) -->
+    <form method="post" action="/community/alpha/student">
+        <!-- 表单中第一个显示的是“姓名”，后面输入内容是text类型，并给它命名为name，以共服务器访问 -->
+        <p>
+            姓名: <input type="text" name="name">
+        </p>
+        <p>
+            年龄: <input type="text" name="age">
+        </p>
+        <!-- 提供一个提交按钮 -->
+        <p>
+            <input type="submit" value="保存">
+        </p>
+    </form>
+</body>
+</html>
