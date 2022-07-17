@@ -16,7 +16,7 @@ public interface UserMapper {
     int insertUser(User user);
     //修改，返回值系统自己定义，为修改的条数
     int updateStatus(int id, int status);
-
+    //更新用户的头像
     int updateHeader(int id, String headerUrl);
 
     int updatePassword(int id, String password);
