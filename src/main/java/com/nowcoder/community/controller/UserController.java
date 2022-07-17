@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CookieValue;
+
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -112,4 +114,35 @@ public class UserController {
         }
     }
 
+    // 修改密码
+    @LoginRequired
+    @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
+    public String updatePassword(String originalPassword, String newPassword, String confirmPassword, Model model, @CookieValue("ticket") String ticket) {
+
+        if (originalPassword == null) {
+            model.addAttribute("originalPasswordMsg", "请输入原始密码!");
+            return "site/setting";
+        }
+        if (newPassword == null) {
+            model.addAttribute("newPasswordMsg", "请输入新密码!");
+            return "site/setting";
+        }
+        if (confirmPassword == null) {
+            model.addAttribute("confirmPasswordMsg", "请输入新密码!");
+            return "site/setting";
+        }
+
+        User user = hostHolder.getUser();
+        if (!CommunityUtil.md5(originalPassword + user.getSalt()).equals(user.getPassword())) {
+            model.addAttribute("originalPasswordMsg", "密码错误!");
+            return "/site/setting";
+        }
+        if (!confirmPassword.equals(newPassword)) {
+            model.addAttribute("confirmPasswordMsg", "两次输入的密码不一致!");
+            return "site/setting";
+        }
+        userService.updatePassword(user.getId(), CommunityUtil.md5(newPassword + user.getSalt()));
+        userService.logout(ticket);
+        return "redirect:/login";
+    }
 }
