@@ -25,21 +25,17 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    //响应请求的方法
-    @RequestMapping(path="/index", method = RequestMethod.GET)
-    // 采用返回视图的方式，因此返回值写 String
-    // 方法调用前，SpringMVC 会自动实例化 Model 和 Page，并且将 Page 注入到 Model中。
-    // 并且可以通过域名所带的current变量的值自动的调用Page中的setCurrent方法，将实例化的Page
-    // 对象的current属性赋值。（域名和属性名一样）
-    // 所以，在thymeleaf中可以直接访问Page对象中的数据。
-    public String getIndexPage(Model model, Page page){
+    @RequestMapping(path = "/index", method = RequestMethod.GET)
+    public String getIndexPage(Model model, Page page) {
+        // 方法调用钱,SpringMVC会自动实例化Model和Page,并将Page注入Model.
+        // 所以,在thymeleaf中可以直接访问Page对象中的数据.
         page.setRows(discussPostService.findDiscussPostRows(0));
         page.setPath("/index");
 
-        List<DiscussPost> list = discussPostService.findDiscussPost(0, page.getOffset(), page.getLimit());
+        List<DiscussPost> list = discussPostService.findDiscussPosts(0, page.getOffset(), page.getLimit());
         List<Map<String, Object>> discussPosts = new ArrayList<>();
-        if(list != null){
-            for(DiscussPost post : list){
+        if (list != null) {
+            for (DiscussPost post : list) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("post", post);
                 User user = userService.findUserById(post.getUserId());
@@ -50,4 +46,5 @@ public class HomeController {
         model.addAttribute("discussPosts", discussPosts);
         return "/index";
     }
+
 }
