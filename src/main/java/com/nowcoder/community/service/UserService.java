@@ -21,6 +21,7 @@ import java.util.Random;
 
 @Service
 public class UserService implements CommunityConstant {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -30,55 +31,50 @@ public class UserService implements CommunityConstant {
     @Autowired
     private TemplateEngine templateEngine;
 
-    @Autowired
-    private LoginTicketMapper loginTicketMapper;
-
     @Value("${community.path.domain}")
     private String domain;
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
     public User findUserById(int id) {
         return userMapper.selectById(id);
     }
 
-    // 注册账号
     public Map<String, Object> register(User user) {
         Map<String, Object> map = new HashMap<>();
-        // 判断账号
+
         // 空值处理
         if (user == null) {
-            throw new IllegalArgumentException("参数不能为空！");
+            throw new IllegalArgumentException("参数不能为空!");
         }
         if (StringUtils.isBlank(user.getUsername())) {
-            map.put("usernameMsg", "账号不能为空");
+            map.put("usernameMsg", "账号不能为空!");
             return map;
         }
-
-        // 判断密码
         if (StringUtils.isBlank(user.getPassword())) {
-            map.put("passwordMsg", "密码不能为空");
+            map.put("passwordMsg", "密码不能为空!");
             return map;
         }
-
-        // 判断邮箱
         if (StringUtils.isBlank(user.getEmail())) {
-            map.put("emailMsg", "邮箱不能为空");
+            map.put("emailMsg", "邮箱不能为空!");
             return map;
         }
 
         // 验证账号
         User u = userMapper.selectByName(user.getUsername());
         if (u != null) {
-            map.put("usernameMsg", "该账号已存在！");
+            map.put("usernameMsg", "该账号已存在!");
             return map;
         }
 
         // 验证邮箱
         u = userMapper.selectByEmail(user.getEmail());
         if (u != null) {
-            map.put("emailMsg", "该邮箱已经被注册！");
+            map.put("emailMsg", "该邮箱已被注册!");
             return map;
         }
 
@@ -88,12 +84,11 @@ public class UserService implements CommunityConstant {
         user.setType(0);
         user.setStatus(0);
         user.setActivationCode(CommunityUtil.generateUUID());
-        // 给用户设置一个随机的头像
         user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         user.setCreateTime(new Date());
         userMapper.insertUser(user);
 
-        // 发送激活邮件
+        // 激活邮件
         Context context = new Context();
         context.setVariable("email", user.getEmail());
         // http://localhost:8080/community/activation/101/code
@@ -105,13 +100,6 @@ public class UserService implements CommunityConstant {
         return map;
     }
 
-    /**
-     * 激活账号
-     *
-     * @param userId ：用户Id
-     * @param code   :激活码
-     * @return
-     */
     public int activation(int userId, String code) {
         User user = userMapper.selectById(userId);
         if (user.getStatus() == 1) {
@@ -177,13 +165,12 @@ public class UserService implements CommunityConstant {
         return loginTicketMapper.selectByTicket(ticket);
     }
 
-    // 更新用户的头像
     public int updateHeader(int userId, String headerUrl) {
         return userMapper.updateHeader(userId, headerUrl);
     }
 
-    // 修改密码
-    public int updatePassword(int userId, String password) {
-        return userMapper.updatePassword(userId, password);
+    public User findUserByName(String username) {
+        return userMapper.selectByName(username);
     }
+
 }

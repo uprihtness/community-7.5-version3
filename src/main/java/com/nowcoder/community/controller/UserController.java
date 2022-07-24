@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
-
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -34,11 +32,9 @@ public class UserController {
     @Value("${community.path.upload}")
     private String uploadPath;
 
-    // 注入域名
     @Value("${community.path.domain}")
     private String domain;
 
-    // 注入项目名
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
@@ -63,7 +59,6 @@ public class UserController {
         }
 
         String fileName = headerImage.getOriginalFilename();
-        // 取图片的后缀
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         if (StringUtils.isBlank(suffix)) {
             model.addAttribute("error", "文件的格式不正确!");
@@ -91,7 +86,6 @@ public class UserController {
         return "redirect:/index";
     }
 
-    // 获取图像
     @RequestMapping(path = "/header/{fileName}", method = RequestMethod.GET)
     public void getHeader(@PathVariable("fileName") String fileName, HttpServletResponse response) {
         // 服务器存放路径
@@ -114,35 +108,4 @@ public class UserController {
         }
     }
 
-    // 修改密码
-    @LoginRequired
-    @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
-    public String updatePassword(String originalPassword, String newPassword, String confirmPassword, Model model, @CookieValue("ticket") String ticket) {
-
-        if (originalPassword == null) {
-            model.addAttribute("originalPasswordMsg", "请输入原始密码!");
-            return "site/setting";
-        }
-        if (newPassword == null) {
-            model.addAttribute("newPasswordMsg", "请输入新密码!");
-            return "site/setting";
-        }
-        if (confirmPassword == null) {
-            model.addAttribute("confirmPasswordMsg", "请输入新密码!");
-            return "site/setting";
-        }
-
-        User user = hostHolder.getUser();
-        if (!CommunityUtil.md5(originalPassword + user.getSalt()).equals(user.getPassword())) {
-            model.addAttribute("originalPasswordMsg", "密码错误!");
-            return "/site/setting";
-        }
-        if (!confirmPassword.equals(newPassword)) {
-            model.addAttribute("confirmPasswordMsg", "两次输入的密码不一致!");
-            return "site/setting";
-        }
-        userService.updatePassword(user.getId(), CommunityUtil.md5(newPassword + user.getSalt()));
-        userService.logout(ticket);
-        return "redirect:/login";
-    }
 }
