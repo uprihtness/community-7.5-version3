@@ -3,48 +3,38 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nowcoder.community.dao.UserMapper">
-    <!--  声明一个sql语句，并且指定id，将经常复用的东西写在里面，之后便可以通过<include refid="selectFields"></include>语句来调用了。   -->
-    <sql id="selectFields">
-        id, username, password, salt, email, type, status, activation_code, header_url, create_time
-    </sql>
+
     <sql id="insertFields">
         username, password, salt, email, type, status, activation_code, header_url, create_time
     </sql>
-    <!-- 声明查询语句select -->
-    <!--  对应于selectById方法   -->
-    <!--  resultType用来声明返回的参数类型   -->
-    <!--  #{id} 表示获取方法中的id参数 -->
+
+    <sql id="selectFields">
+        id, username, password, salt, email, type, status, activation_code, header_url, create_time
+    </sql>
+
     <select id="selectById" resultType="User">
-        <!--  里面写SQL语句 -->
         select <include refid="selectFields"></include>
         from user
         where id = #{id}
     </select>
 
     <select id="selectByName" resultType="User">
-        <!--  里面写SQL语句 -->
         select <include refid="selectFields"></include>
         from user
         where username = #{username}
     </select>
 
     <select id="selectByEmail" resultType="User">
-        <!--  里面写SQL语句 -->
         select <include refid="selectFields"></include>
         from user
         where email = #{email}
     </select>
 
-    <!-- 声明插入语句insert  -->
-    <!-- 声明插入语句insert时，需要使用parameterType参数来指定插入的参数类型，需要使用keyProperty参数来指定主键类型  -->
     <insert id="insertUser" parameterType="User" keyProperty="id">
-        <!-- 因为已经在keyProperty指明了id，故插入语句中无需再指明id信息  -->
         insert into user (<include refid="insertFields"></include>)
         values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
     </insert>
 
-    <!-- 声明更新语句update -->
-    <!-- 简单类型的传入参数无需用parameterType来声明 -->
     <update id="updateStatus">
         update user set status = #{status} where id = #{id}
     </update>
